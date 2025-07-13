@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Travel Diary{% endblock %}
+
+{% block content %}
+<h2>Admin Panel - Incident Reports</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Description</th>
+      <th>Country</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>Timestamp</th>
+      <th>Moderated</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for incident in incidents %}
+    <tr>
+      <td>{{ incident.id }}</td>
+      <td>{{ incident.description }}</td>
+      <td>{{ incident.country }}</td>
+      <td>{{ incident.latitude }}</td>
+      <td>{{ incident.longitude }}</td>
+      <td>{{ incident.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ 'Yes' if incident.moderated else 'No' }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('moderate_incident', incident_id=incident.id) }}" style="display:inline;">
+          <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve</button>
+          <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
