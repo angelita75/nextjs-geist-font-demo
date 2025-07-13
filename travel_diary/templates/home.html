@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Travel Diary{% endblock %}
+
+{% block content %}
+<h2>Recent Diary Entries</h2>
+{% if diaries %}
+  <div class="list-group mb-4">
+    {% for diary in diaries %}
+      <div class="list-group-item">
+        <h5>{{ diary.title }} <small class="text-muted">({{ diary.country }})</small></h5>
+        <p>{{ diary.content }}</p>
+        <small class="text-muted">Posted on {{ diary.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No diary entries yet.</p>
+{% endif %}
+
+<h2>Incident Reports Map</h2>
+<div id="map"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var map = L.map('map').setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    var incidents = {{ incidents|tojson|safe }};
+
+    incidents.forEach(function(incident) {
+      var lat = parseFloat(incident.latitude);
+      var lng = parseFloat(incident.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        var marker = L.marker([lat, lng]).addTo(map);
+        marker.bindPopup('<b>' + incident.country + '</b><br>' + incident.description);
+      }
+    });
+  });
+</script>
+{% endblock %}
